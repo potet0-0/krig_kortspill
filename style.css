@@ -1,0 +1,23 @@
+﻿body {
+    background-color: blueviolet;
+}
+
+.top {
+    display: flex;
+    justify-content: center;
+}
+
+.kort {
+    display: flex;
+    justify-content: center;
+    gap: 30vh;
+}
+
+.kort button {
+    padding: 20px 20px;
+}
+
+.kort button:hover {
+    transform: scale(1.05);
+    animation: ease-in-out 0.5s;
+}
