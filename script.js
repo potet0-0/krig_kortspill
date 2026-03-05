@@ -1,9 +1,8 @@
-﻿const suits = ['♠', '♥', '♦', '♣'];
-const ranks = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+﻿const suits = ['H', 'K', 'R', 'S'];
 
 let deck = suits.flatMap(suit =>
-    ranks.map((rank, i) => ({
-        display: `${rank}${suit}`,
+    Array.from({ length: 13 }, (_, i) => ({
+        display: `cards/${suit}${String(i + 1).padStart(2, '0')}.png`,
         value: i + 2
     }))
 );
@@ -25,44 +24,64 @@ function drawCard() {
 }
 
 deck = shuffle(deck);
+console.log(deck.map(card => card.display));
 
 const button = document.getElementById("draw-btn");
 const display1 = document.getElementById("card1-display");
 const display2 = document.getElementById("card2-display");
 const result = document.getElementById("result");
-const scoreDisplay = document.getElementById("score");
+const deckCount = document.getElementById("deck-count");
+const scoreEl1 = document.getElementById("score1");
+const scoreEl2 = document.getElementById("score2");
+
+function setResult(text, type) {
+    result.textContent = text;
+    result.className = `result-text ${type}`;
+}
 
 button.addEventListener("click", () => {
     const card1 = drawCard();
     const card2 = drawCard();
 
     if (card1 === null || card2 === null) {
-        result.textContent = "Ingen flere kort!";
+        setResult("Ingen flere kort!", "empty");
         button.disabled = true;
         return;
     }
 
-    display1.textContent = card1.display;
-    display2.textContent = card2.display;
+    display1.classList.remove("flip");
+    display2.classList.remove("flip");
+    void display1.offsetWidth;
+    void display2.offsetWidth;
+    display1.classList.add("flip");
+    display2.classList.add("flip");
+
+    display1.innerHTML = `<img src="${card1.display}" alt="kort">`;
+    display2.innerHTML = `<img src="${card2.display}" alt="kort">`;
+    deckCount.textContent = deck.length;
+
+    // Remove highlights
+    scoreEl1.classList.remove("highlight");
+    scoreEl2.classList.remove("highlight");
 
     if (card1.value > card2.value) {
         score1 += 2;
-        result.textContent = "Spiller 1 vinner!";
+        scoreEl1.textContent = score1;
+        scoreEl1.classList.add("highlight");
+        setResult("Spiller 1 vinner!", "win1");
     } else if (card2.value > card1.value) {
         score2 += 2;
-        result.textContent = "Spiller 2 vinner!";
+        scoreEl2.textContent = score2;
+        scoreEl2.classList.add("highlight");
+        setResult("Spiller 2 vinner!", "win2");
     } else {
-        result.textContent = "Uavgjort!";
+        setResult("Uavgjort!", "tie");
     }
 
-    scoreDisplay.textContent = `Spiller 1: ${score1} kort — Spiller 2: ${score2} kort`;
-
     if (deck.length === 0) {
-        if (score1 > score2) result.textContent = `Spill slutt! Spiller 1 vinner med ${score1} kort!`;
-        else if (score2 > score1) result.textContent = `Spill slutt! Spiller 2 vinner med ${score2} kort!`;
-        else result.textContent = "Spill slutt! Uavgjort!";
+        if (score1 > score2) setResult("Spiller 1 vinner spillet!", "win1");
+        else if (score2 > score1) setResult("Spiller 2 vinner spillet!", "win2");
+        else setResult("Uavgjort!", "tie");
         button.disabled = true;
     }
 });
-
-console.log(deck.map(card => card.display));
